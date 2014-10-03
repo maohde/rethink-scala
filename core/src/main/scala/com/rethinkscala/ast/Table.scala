@@ -58,6 +58,15 @@ case class Table[T <: Document](name: String, useOutDated: Option[Boolean] = Non
 
   def getAll(attr: Any*): GetAll[T] = GetAll[T](this, attr, None)
 
+  def getIntersecting(geometry: GeometryType, index: String): GetIntersecting[T] = GetIntersecting[T](this, geometry, index)
+
+  def getNearest(point: Point,
+                 index: String,
+                 max_results: Option[Int] = None,
+                 max_dist: Option[AnyVal] = None,
+                 unit: Option[String] = None,
+                 geo_system: Option[String] = None): GetNearest[T] = GetNearest[T](this, point, index, max_results, max_dist, unit, geo_system)
+
   def indexes = IndexList(this)
 
 
@@ -67,6 +76,10 @@ case class Table[T <: Document](name: String, useOutDated: Option[Boolean] = Non
 
   def indexCreate(name: String, multi: Boolean) = IndexCreate(this, name, None, Some(multi))
 
+  def indexCreate(name: String,
+                  predicate: Option[Predicate] = None,
+                  multi: Option[Boolean] = None,
+                  geo: Option[Boolean] = None) = IndexCreate(this, name, predicate, multi, geo)
 
   def indexCreate(name: String) = IndexCreate(this, name)
 
@@ -120,14 +133,14 @@ case class TableList(db: Option[DB] = None) extends ProduceSequence[String] {
   * @param name
   * @param predicate
   */
-case class IndexCreate(target: TableTyped, name: String, predicate: Option[Predicate] = None, multi: Option[Boolean] = None) extends ProduceBinary with BinaryConversion {
+case class IndexCreate(target: TableTyped, name: String, predicate: Option[Predicate] = None, multi: Option[Boolean] = None, geo: Option[Boolean] = None) extends ProduceBinary with BinaryConversion {
 
   override lazy val args = buildArgs(predicate.map {
     f => Seq(target, name, f())
   }.getOrElse(Seq(target, name)): _*)
 
 
-  override lazy val optargs = buildOptArgs(Map("multi" -> multi))
+  override lazy val optargs = buildOptArgs(Map("multi" -> multi, "geo" -> geo))
 
   def termType = TermType.INDEX_CREATE
 

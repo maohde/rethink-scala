@@ -143,7 +143,32 @@ trait RethinkApi extends TimeNames {
 
   def json(str: String) = Json(str)
 
+  def point(longitude: AnyVal, latitude: AnyVal) = new Point(longitude,latitude)
 
+  def line(pointA: (AnyVal, AnyVal), pointBs: (AnyVal, AnyVal)*) = new Line(pointA,pointBs:_*)
+
+  def line(pointA: Point, pointBs: Point*) = new Line(pointA,pointBs:_*)
+
+  def polygon(pointA: (AnyVal, AnyVal), pointB: (AnyVal, AnyVal), pointCs: (AnyVal, AnyVal)*) = new Polygon(pointA,pointB,pointCs:_*)
+
+  def polygon(pointA: Point, pointB: Point, pointCs: Point*) = new Polygon(pointA,pointB,pointCs:_*)
+
+  def circle(longitude: AnyVal,
+              latitude: AnyVal,
+              radius: AnyVal,
+              numVertices: Option[Int] = None,
+              geoSystem: Option[String] = None,
+              unit: Option[String] = None,
+              fill: Option[Boolean] = None) =
+    new Circle(longitude,latitude,radius,numVertices,geoSystem,unit,fill)
+
+  def circle(point: Point,
+             radius: AnyVal,
+             numVertices: Option[Int],
+             geoSystem: Option[String],
+             unit: Option[String],
+             fill: Option[Boolean]) =
+    new Circle(point,radius,numVertices,geoSystem,unit,fill)
 }
 
 
