@@ -22,16 +22,30 @@ case class NestedAddress1(street:NestedStreet)       extends NestedAddress
 
 case class NestedAddress2(name:String)  extends NestedAddress
 
-case class NestedUser(name: String, active: Boolean , address:List[NestedAddress], id: Option[String] = None)
+case class NestedUser(name: String, address:List[NestedAddress], id: Option[Int])
+
 
 class NestedTest extends FunSuite with WithBase {
 
 
   test("nested documents") {
+    val users = for (i <- (0 to 10)) yield NestedUser("foo", List(NestedAddress1(NestedStreet(NestedZip("Blah"))), NestedAddress2("blah")), Some(i))
+    
+    val usertable = table.to[NestedUser]
 
-    val user = NestedUser("foo",true,List(NestedAddress1(NestedStreet(NestedZip("hello"))),NestedAddress2("foo")))
-    val foos= r.tableAs[NestedUser]("foo")
-    val term = foos.insert(user)
+    val term = usertable.insert(users).run
+    assert(usertable.between(1,8), {
+      f: Seq[NestedUser] => 
+        f.head.address.head match {
+          case NestedAddress1(NestedStreet(NestedZip(zip))) => 
+            println(" ZIP = " + zip)
+            true
+          case _ => false
+        } 
+        
+    })
+
+    /*
     val query = version3.toQuery(term, 1, None, Map.empty)
     val json = query.json
 
@@ -41,7 +55,10 @@ class NestedTest extends FunSuite with WithBase {
     } yield user2
 
     println(answer)
+    */
   }
+
+
 
   // override def setupDB = false
 }

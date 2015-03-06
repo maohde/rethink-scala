@@ -26,11 +26,11 @@ trait WithBase extends BeforeAndAfterAll with ShouldMatchers {
   self: FunSuite =>
 
   val host = (Option(scala.util.Properties.envOrElse("TRAVIS", "empty")) map {
-    case "empty" => "172.16.2.45"
+    //case "empty" => "172.16.2.45"
     case _ => "127.0.0.1"
   }).get
   val port = 28015
-  val authKey = "foobar"
+  val authKey = ""
 
   val version2 = new Version2(host, port, authKey = authKey)
   val version3 = new Version3(host, port, authKey = authKey)
